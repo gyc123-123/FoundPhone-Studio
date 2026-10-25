@@ -715,6 +715,17 @@ svg {
   color: #fff;
   background-size: cover;
 }
+.wallpaper-hj-p1 {
+  background: #d9dfe2 url("/assets/story/p1.jpg") center/cover no-repeat;
+}
+.wallpaper-hj-p1 .wallpaper-orb {
+  display: none;
+}
+.wallpaper-hj-p1:not(.in-app) .status-bar,
+.wallpaper-hj-p1 .app-name {
+  color: white;
+  text-shadow: 0 1px 3px #0007;
+}
 .wallpaper-sage {
   background: linear-gradient(
     155deg,

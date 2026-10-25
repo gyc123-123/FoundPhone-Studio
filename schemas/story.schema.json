@@ -110,6 +110,10 @@
               },
               "icon": {
                 "type": "string"
+              },
+              "locked": {
+                "default": false,
+                "type": "boolean"
               }
             },
             "required": [

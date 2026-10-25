@@ -64,12 +64,21 @@ function Back({ onClick }: { onClick: () => void }) {
 export function MymyKakao(p: SkinProps) {
   const [tab, setTab] = useSkinState<string>(p, "mymyTab", "聊天"),
     [sent, setSent] = useSkinState<string[]>(p, "mymyKktSent", []),
+    [replied, setReplied] = useSkinState<string[]>(p, "mymyKktReplied", []),
     [draft, setDraft] = useState(""),
     [query, setQuery] = useState(""),
     [menu, setMenu] = useState(false);
-  const list = grouped(p.items),
+  const pendingReply = p.items.find(
+    (i) =>
+      i.title === p.thread &&
+      i.meta.pendingReply === "true" &&
+      !replied.includes(i.id),
+  );
+  const list = grouped(p.items.filter((i) => i.meta.pendingReply !== "true")),
     messages = [
-      ...p.items.filter((i) => i.title === p.thread),
+      ...p.items.filter(
+        (i) => i.title === p.thread && i.meta.pendingReply !== "true",
+      ),
       ...sent.flatMap((raw, index) => {
         try {
           const entry: unknown = JSON.parse(raw);
@@ -160,6 +169,10 @@ export function MymyKakao(p: SkinProps) {
             onSubmit={(e) => {
               e.preventDefault();
               if (draft.trim()) {
+                if (pendingReply && draft.trim() === pendingReply.body) {
+                  setReplied([...replied, pendingReply.id]);
+                  p.onRead(pendingReply.id);
+                }
                 setSent([
                   ...sent,
                   JSON.stringify([
@@ -184,6 +197,9 @@ export function MymyKakao(p: SkinProps) {
               placeholder="输入消息"
               value={draft}
               maxLength={2000}
+              onFocus={() => {
+                if (pendingReply && !draft) setDraft(pendingReply.body);
+              }}
               onChange={(e) => setDraft(e.target.value)}
             />
             <Smile size={22} />

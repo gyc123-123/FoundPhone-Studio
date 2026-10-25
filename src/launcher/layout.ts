@@ -48,6 +48,7 @@ export function ensureAppStore(work: Work): Work {
             dock: false,
             folder: "",
             icon: "",
+            locked: false,
           },
         ],
       };

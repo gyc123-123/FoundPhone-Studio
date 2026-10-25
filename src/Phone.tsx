@@ -141,6 +141,7 @@ function PhoneRuntime({
   const [recent, setRecent] = useState<string[]>([]);
   const appSnapshots = useRef(new Map<string, HTMLElement>());
   const [banner, setBanner] = useState("");
+  const [endingSeen, setEndingSeen] = useState(0);
   const noticesSeen = useRef(0);
   const [contextApp, setContextApp] = useState("");
   const [deviceScale, setDeviceScale] = useState(0.84);
@@ -266,7 +267,13 @@ function PhoneRuntime({
       if (!recent.includes(id) && id !== app) appSnapshots.current.delete(id);
   };
   const open = (id: string) => {
-    if (!work.apps.some((a) => a.id === id && a.installed)) return;
+    const entry = work.apps.find((a) => a.id === id && a.installed);
+    if (!entry) return;
+    if (entry.locked) {
+      setBanner(`${entry.name}：暂时无法打开`);
+      setTimeout(() => setBanner(""), 2500);
+      return;
+    }
     setApp(id);
     setKeyboard(false);
     setRecent((v) => [id, ...v.filter((a) => a !== id)].slice(0, 8));
@@ -592,7 +599,7 @@ function PhoneRuntime({
               ))}
             </div>
           )}
-          {!creator && s.endings.length > 0 && !locked && (
+          {!creator && s.endings.length > 0 && endingSeen < s.endings.length && !locked && (
             <div className="story-overlay ending">
               <span className="eyebrow">ENDING · {s.endings.length}</span>
               <h2>故事在这里停泊。</h2>
@@ -602,9 +609,13 @@ function PhoneRuntime({
                   update(dispatch(work, initialRuntime(work), "start"));
                   setApp("");
                   setLocked(true);
+                  setEndingSeen(0);
                 }}
               >
                 重新开始
+              </button>
+              <button onClick={() => setEndingSeen(s.endings.length)}>
+                继续查看手机
               </button>
             </div>
           )}

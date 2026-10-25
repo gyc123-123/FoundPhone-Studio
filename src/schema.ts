@@ -117,6 +117,7 @@ export const workSchema = z.object({
         dock: z.boolean(),
         folder: z.string(),
         icon: z.string(),
+        locked: z.boolean().optional(),
       }),
     )
     .max(100),
